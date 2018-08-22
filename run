@@ -1,0 +1,45 @@
+#!/bin/sh
+
+set -e -x
+
+grub_commit="6782f6d431d22b4e9ab14e94d263795c7991e160"
+
+# create required directories
+mkdir /root/src/grub-src
+mkdir /root/src/build-cross-aarch64
+mkdir /root/src/build-x86_64
+
+# checkout grub and patch grub
+cd /root/src/grub-src
+git clone https://github.com/coreos/grub.git
+cd grub
+git checkout -b grub-build $grub_commit
+
+for patch in /root/src/patches/*; do
+	echo "Applying $patch";
+	patch -p1 < "$patch"
+done
+./autogen.sh
+
+# shadow build cross aarch64
+cd /root/src/build-cross-aarch64
+../grub-src/grub/configure --prefix=/usr/local/viryaos-grub/cross-aarch64 --with-platform=efi --target=aarch64-alpine-linux-musl CFLAGS="-Os -Wno-unused-value"
+make
+make install
+
+# shadow build x86_64
+cd /root/src/build-x86_64
+../grub-src/grub/configure --prefix=/usr/local/viryaos-grub/x86_64 --with-platform=efi CFLAGS="-Os -Wno-unused-value"
+make
+make install
+
+# create tarball
+cd /usr/local
+tar cvf viryaos-grub.tar viryaos-grub
+gzip -9v viryaos-grub.tar
+mv viryaos-grub.tar.gz /tmp
+
+# cleanup
+rm -rf /root/src/grub-src
+rm -rf /root/src/build-cross-aarch64
+rm -rf /root/src/build-x86_64
