@@ -14,7 +14,7 @@ Then,
 ```
 $ cd viyaos-grub
 
-$ docker build --squash -t viryaos-grub-builder .
+$ docker build --network=host -t viryaos-grub-builder .
 ```
 
 Once the image is built, running the image with `run` script, would generate
@@ -23,7 +23,7 @@ Once the image is built, running the image with `run` script, would generate
 ```
 $ cd viyaos-grub
 
-$ docker run --rm -ti -v /tmp:/tmp -v $(pwd):/root/src \
+$ docker run --network=host --rm -ti -v /tmp:/tmp -v $(pwd):/root/src \
     viryaos-grub-builder /root/src/run
 ```
 

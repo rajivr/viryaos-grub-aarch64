@@ -1,4 +1,9 @@
-FROM abuild-builder-cross-aarch64:latest
+FROM arm64v8/alpine:3.7
+
+COPY [ \
+  "./qemu-aarch64-static", \
+  "/usr/bin/qemu-aarch64-static" \
+]
 
 RUN \
   # apk
@@ -15,6 +20,8 @@ RUN \
   apk add linux-headers && \
   apk add make && \
   apk add python2 && \
+  apk add git && \
+  apk add musl-dev && \
   \
   # cleanup
   cd /root && \
