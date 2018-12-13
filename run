@@ -2,7 +2,7 @@
 
 set -e -x
 
-grub_commit="6782f6d431d22b4e9ab14e94d263795c7991e160"
+grub_commit="d34977cb662d9d3c74532dc175103758c47f552f"
 
 # create required directories
 rm -rf /root/src/grub-src /root/src/build-cross-aarch64 /root/src/build-x86_64
@@ -12,14 +12,10 @@ mkdir -p /root/src/build-x86_64
 
 # checkout grub and patch grub
 cd /root/src/grub-src
-git clone https://github.com/coreos/grub.git
+git clone https://git.savannah.gnu.org/git/grub.git
 cd grub
 git checkout -b grub-build $grub_commit
 
-for patch in /root/src/patches/*; do
-	echo "Applying $patch";
-	patch -p1 < "$patch"
-done
 ./autogen.sh
 ./configure --prefix=/usr/local/viryaos-grub --with-platform=efi --target=aarch64-alpine-linux-musl CFLAGS="-Os -Wno-unused-value"
 make
