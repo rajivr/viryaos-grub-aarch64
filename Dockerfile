@@ -1,8 +1,8 @@
 FROM arm64v8/alpine:3.7
 
 COPY [ \
-  "./qemu-aarch64-static", \
-  "/usr/bin/qemu-aarch64-static" \
+  "./qemu-aarch64", \
+  "/usr/bin/qemu-aarch64" \
 ]
 
 RUN \
