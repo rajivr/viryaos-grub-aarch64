@@ -1,56 +1,26 @@
-# viryaos-grub for v3.7
+# viryaos-grub-aarch64
 
-This directory has two docker files which is used to build and create an image
-of `viryaos-grub`.
-
-To get started first build abuild-builder-cross-aarch64 docker image.
-
-See
-[here](https://gitlab.com/ViryaOS/abuild-builder-cross-aarch64/blob/3.7-stable/README.md)
-for details on how to build abuild-builder-cross-aarch64 docker image.
-
-Then,
+## `Dockerfile.image`
 
 ```
-$ cd viyaos-grub
+$ cd viryaos-grub-aarch64/
 
-$ docker build --network=host -t viryaos-grub-builder .
+$ docker build --force-rm --squash --file Dockerfile.image -t viryaos-grub-aarch64 .
 ```
 
-Once the image is built, running the image with `run` script, would generate
-`viryaos-grub.tar.gz` in `/tmp` directory.
+## `/vos_run`
+
+Go to the directory containing `ViryaOS` tree.
 
 ```
-$ cd viyaos-grub
-
-$ docker run --network=host --rm -ti -v /tmp:/tmp -v $(pwd):/root/src \
-    viryaos-grub-builder /root/src/run
+$ docker run --rm -ti -v $(pwd):/home/builder/src \
+    viryaos-grub-aarch64 /vos_run
 ```
 
-`viryaos-grub.tar.gz` contains the grub build for `x86_64` and cross built grub
-for `aarch64`.
-
-Once `viryaos-grub.tar.gz` is built, it can be packaged as a docker image for
-downstream use. This can be done using `Dockerfile.image`.
+## `Dockerfile.package`
 
 ```
-(inside viryaos-grub directory)
+$ cd viryaos-grub-aarch64
 
-$ git rev-parse --short HEAD
-```
-
-To build the docker image
-
-```
-$ cd viryaos-grub
-
-$ cp /tmp/viryaos-grub.tar.gz .
-
-$ docker build -f Dockerfile.image --squash \
-    -t viryaos/viryaos-grub:<VERSION>-<SHORT_SHA>-<ARCH1>.<ARCH2> .
-
-(For example)
-
-$ docker build -f Dockerfile.image --squash \
-    -t viryaos/viryaos-grub:v3.7-abcdef1-aarch64.x86_64 .
+$ docker build --force-rm --squash --file Dockerfile.package -t viryaos-grub-aarch64-package . 
 ```

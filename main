@@ -1,0 +1,31 @@
+#!/bin/sh
+
+set -e -x
+
+grub_commit="d34977cb662d9d3c74532dc175103758c47f552f"
+
+# create required directories
+rm -rf /root/src/grub-src
+mkdir -p /root/src/grub-src
+
+# checkout grub and patch grub
+cd /root/src/grub-src
+git clone https://git.savannah.gnu.org/git/grub.git
+cd grub
+git checkout -b grub-build $grub_commit
+
+./autogen.sh
+./configure --prefix=/usr/local/viryaos-grub --with-platform=efi --target=aarch64-alpine-linux-musl CFLAGS="-Os -Wno-unused-value"
+make
+make install
+
+# create the EFI image
+grub_modules="part_gpt fat ext2 iso9660 gzio linux acpi normal cpio crypto disk boot crc64 tftp verify xzio xfs video xen_boot gfxterm efi_gop"
+
+container_output="/home/builder/src/viryaos-grub-aarch64/output-viryaos-grub-aarch64"
+
+rm -rf $container_output
+
+mkdir $container_output
+
+/usr/local/viryaos-grub/bin/grub-mkimage --format=arm64-efi --output=${container_output}/BOOTAA64.EFI --directory=/usr/local/viryaos-grub/lib/grub/arm64-efi --prefix=/ ${grub_modules}

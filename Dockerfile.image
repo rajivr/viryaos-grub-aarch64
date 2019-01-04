@@ -1,10 +1,37 @@
-FROM busybox:musl
+FROM arm64v8/alpine:3.7
 
 COPY [ \
-  "./viryaos-grub.tar.gz", \
-  "/home/builder/viryaos-grub.tar.gz" \
+  "./docker-extras/*", \
+  "/tmp/docker-build/" \
 ]
 
-# NOTE: DO NOT ADD ANY MORE LAYERS
-#
-# Adding additional can increase images size unnecessarily. So, don't do it!
+COPY [ \
+  "qemu-aarch64", \
+  "/usr/bin/qemu-aarch64" \
+]
+
+RUN \
+  # apk
+  apk update && \
+  \
+  # grub dependencies
+  apk add autoconf && \
+  apk add automake && \
+  apk add bison && \
+  apk add flex && \
+  apk add gcc && \
+  apk add gettext && \
+  apk add libtool && \
+  apk add linux-headers && \
+  apk add make && \
+  apk add python2 && \
+  apk add git && \
+  apk add musl-dev && \
+  \
+  # copy vos_run file
+  cp /tmp/docker-build/vos_run /vos_run && \
+  \
+  # cleanup
+  cd /root && \
+  rm -rf /tmp/* && \
+  rm -f /var/cache/apk/*
